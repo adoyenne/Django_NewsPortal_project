@@ -1,1 +1,1 @@
-# Django_NewsPortal_project
+NewsPortal project on Django
