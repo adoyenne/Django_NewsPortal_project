@@ -1,0 +1,23 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}!
+{% block title %}
+Newa
+{% endblock %}
+
+{% block content %}
+<h1>Today's news</h1>
+<!-- Вывод количества новостей -->
+<p>Number of news: {{ Posts|length }}</p>
+<ul>
+    {% for post in Posts %}
+        <li>
+            <h2>{{ post.title }}</h2>
+            <p>Publication date: {{ post.created_at|date:"d.m.Y" }}</p>
+            <p>{{ post.text|truncatewords:30|censor }}</p>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
