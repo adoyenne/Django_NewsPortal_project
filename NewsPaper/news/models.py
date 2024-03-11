@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class Author(models.Model):
 
@@ -22,6 +23,9 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
 
 class Post(models.Model):
     ARTICLE = 'article'
@@ -46,7 +50,8 @@ class Post(models.Model):
         else:
             return self.text[:preview_length].strip() + '...'
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    #To save news/articles in create I added settings.AUTH_USER_MODEL here:
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
     post_type = models.CharField(max_length=7, choices=POST_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(Category, through='PostCategory')

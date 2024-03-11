@@ -2,22 +2,52 @@
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}!
+{% load custom_tags %}
+
 {% block title %}
-Newa
+News
 {% endblock %}
 
 {% block content %}
-<h1>Today's news</h1>
 <!-- Вывод количества новостей -->
-<p>Number of news: {{ Posts|length }}</p>
-<ul>
-    {% for post in Posts %}
-        <li>
-            <h2>{{ post.title }}</h2>
-            <p>Publication date: {{ post.created_at|date:"d.m.Y" }}</p>
-            <p>{{ post.text|truncatewords:30|censor }}</p>
-        </li>
-    {% endfor %}
-</ul>
+<h1>Today's news</h1>
+    <p>Number of news: {{ Posts|length }}</p>
+    <ul>
+        {% for post in page_obj %}
+            <li>
+                <h2>{{ post.title }}</h2>
+                <p>Publication date: {{ post.created_at|date:"d.m.Y l" }}</p>
+                <p>{{ post.text|truncatewords:30|censor }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+
+ {# Добавляем пагинацию на страницу #}
+
+ {# Pagination #}
+<div class="pagination">
+    {% if is_paginated %}
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</div>
 {% endblock %}
+
+
 
