@@ -20,10 +20,15 @@ from django.views.generic.base import RedirectView
 
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='/news/')),  # Redirect root URL to /news/
+    path('', RedirectView.as_view(url='/posts/')),  # Redirect root URL to /news/
     path('admin/', admin.site.urls),
+    #path('accounts/', include('django.contrib.auth.urls')),
+    #path("accounts/", include("accounts.urls")),  # Добавили эту строчку
+    path("accounts/", include("allauth.urls")),  # Оставили только allauth
     path('pages/', include('django.contrib.flatpages.urls')),
-    path('news/', include('news.urls')),  # Include news URLs
+    path('posts/', include('news.urls')),  # Include news URLs
     # Other URL patterns
 ]
+
+
 

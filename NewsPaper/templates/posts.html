@@ -5,12 +5,12 @@
 {% load custom_tags %}
 
 {% block title %}
-News
+Posts
 {% endblock %}
 
 {% block content %}
 <!-- Вывод количества новостей -->
-<h1>Today's news</h1>
+<h1>Today's posts</h1>
     <p>Number of news: {{ Posts|length }}</p>
     <ul>
         {% for post in page_obj %}
@@ -18,6 +18,16 @@ News
                 <h2>{{ post.title }}</h2>
                 <p>Publication date: {{ post.created_at|date:"d.m.Y l" }}</p>
                 <p>{{ post.text|truncatewords:30|censor }}</p>
+                {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
+                 <!-- Гиперссылка для изменения новости/статьи -->
+                {% if perms.news.change_post %}
+                    <a href="{% url 'edit_news' pk=post.pk %}">Edit</a>
+                {% endif %}
+                {% if perms.news.delete_post %}
+                    <a href="{% url 'delete_news' pk=post.pk %}">Delete</a>
+                {% endif %}
+
+
             </li>
         {% endfor %}
     </ul>

@@ -35,6 +35,7 @@ class Post(models.Model):
         (NEWS, 'News'),
     ]
 
+
     def like(self):
         self.rating += 1
         self.save()

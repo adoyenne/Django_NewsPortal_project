@@ -10,6 +10,8 @@ from django.http import Http404
 from .forms import NewsForm, ArticleForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
 
 class PostsList(ListView):
     # Указываем модель, объекты которой мы будем выводить
@@ -83,7 +85,8 @@ def search_news(request):
     }
     return render(request, 'search_news.html', context)
 
-class CreateNewsView(CreateView):
+class CreateNewsView(PermissionRequiredMixin,CreateView):
+    permission_required = ('news.add_post',)
     model = Post
     form_class = NewsForm
     template_name = 'create_news.html'
@@ -96,7 +99,8 @@ class CreateNewsView(CreateView):
     def get_success_url(self):
         return reverse_lazy('post_list')
 
-class CreateArticleView(CreateView):
+class CreateArticleView(PermissionRequiredMixin,CreateView):
+    permission_required = ('news.add_post',)
     model = Post
     form_class = ArticleForm
     template_name = 'create_article.html'
@@ -111,13 +115,16 @@ class CreateArticleView(CreateView):
 
 
 
-class EditPostView(UpdateView):
+class EditPostView(PermissionRequiredMixin,UpdateView):
+    permission_required = ('news.change_post',)
+
     model = Post
     fields = ['title', 'text', 'categories']
 
     def get_template_names(self):
         post = self.get_object()
         if post.post_type == 'article':
+
             return ['edit_article.html']
         elif post.post_type == 'news':
             return ['edit_news.html']
@@ -148,13 +155,15 @@ class EditPostView(UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class DeletePostView(DeleteView):
+class DeletePostView(PermissionRequiredMixin,DeleteView):
+    permission_required = ('news.delete_post',)
     model = Post
     success_url = reverse_lazy('post_list')  # This redirects to the home page after deleting a post
 
     def get_template_names(self):
         post = self.get_object()
         if post.post_type == 'article':
+
             return ['delete_article.html']
         elif post.post_type == 'news':
             return ['delete_news.html']
