@@ -1,2 +1,2 @@
 NewsPortal project on Django
-(Now updated according tasks in module D3)
+(Now updated according tasks in module D6)
