@@ -23,8 +23,8 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             send_article_list,
-            #trigger=CronTrigger(day_of_week='fri', hour='18', minute='00'),  # Каждую пятницу в 18:00
-            trigger=CronTrigger(minute="*/2"),  # Запустить каждые 2 минуты (для проверки работы)
+            trigger=CronTrigger(day_of_week='fri', hour='18', minute='00'),  # Каждую пятницу в 18:00
+            #trigger=CronTrigger(minute="*/2"),  # Запустить каждые 2 минуты (для проверки работы)
             id='send_article_list',
             replace_existing=True,
         )
