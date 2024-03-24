@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q
-from .models import Post, Category
+from .models import Post, Category, Subscriber
 from .forms import NewsForm, ArticleForm
 from django.http import Http404
 from .forms import NewsForm, ArticleForm
@@ -12,6 +12,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+from django.db import models
+from django.shortcuts import get_object_or_404
 
 class PostsList(ListView):
     # Указываем модель, объекты которой мы будем выводить
@@ -182,5 +186,42 @@ class DeletePostView(PermissionRequiredMixin,DeleteView):
 
 #######################################################################
 
+@login_required
+@csrf_protect
+def subscriptions(request):
+    if request.method == 'POST':
+        # Получаем категорию из запроса, обрабатываемая или вызываем ошибку 404, если категория не существует
+        category_id = request.POST.get('category_id')
+        category = get_object_or_404(Category, id=category_id)
 
+        # Получаем текущего пользователя
+        user = request.user
+
+        # Получаем объект подписчика для текущего пользователя, создаем его, если он не существует
+        subscriber, created = Subscriber.objects.get_or_create(user=user, email=user.email)
+
+        # Обрабатываем действие (подписка или отписка)
+        action = request.POST.get('action')
+        if action == 'subscribe':
+            subscriber.subscribed_categories.add(category)
+        elif action == 'unsubscribe':
+            subscriber.subscribed_categories.remove(category)
+
+        return redirect('subscriptions')
+
+    # Получаем все категории с аннотацией о том, подписан ли пользователь на них
+    categories_with_subscriptions = Category.objects.all().annotate(
+        user_subscribed=models.Exists(
+            Subscriber.objects.filter(
+                user=request.user,
+                subscribed_categories=models.OuterRef('pk'),
+            )
+        )
+    ).order_by('name')
+
+    return render(
+        request,
+        'subscriptions.html',
+        {'categories': categories_with_subscriptions},
+    )
 

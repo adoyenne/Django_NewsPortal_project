@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex',
+    'django_apscheduler',
 
 ]
 
@@ -60,7 +61,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' #optional too
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -155,3 +156,19 @@ STATICFILES_DIRS = [
 LOGIN_REDIRECT_URL = "/posts"
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #класс отправителя сообщений (у нас установлено значение по умолчанию, а значит, эта строчка не обязательна);
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #to test better to use console displaying...
+EMAIL_HOST = 'smtp.yandex.ru' #хост почтового сервера;
+EMAIL_PORT = 465 #порт, на который почтовый сервер принимает письма;
+EMAIL_HOST_USER = "arseniykaragodin@yandex.com" #логин пользователя почтового сервера;
+EMAIL_HOST_PASSWORD = "rvvparyceapmkwmk" #пароль пользователя почтового сервера;
+EMAIL_USE_TLS = False #необходимость использования TLS (зависит от почтового сервера, смотрите документацию по настройке работы с сервером по SMTP);
+EMAIL_USE_SSL = True #необходимость использования SSL (зависит от почтового сервера, смотрите документацию по настройке работы с сервером по SMTP);
+
+DEFAULT_FROM_EMAIL = "arseniykaragodin@yandex.com" #почтовый адрес отправителя по умолчанию.
+
+SERVER_EMAIL = "arseniykaragodin@yandex.com"
+MANAGERS = (
+    ('Arseniy', 'a.doyennel@vu.nl'),
+)

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.urls import reverse
+
+from django.core.mail import send_mail
 
 class Author(models.Model):
 
@@ -53,12 +56,16 @@ class Post(models.Model):
 
     #To save news/articles in create I added settings.AUTH_USER_MODEL here:
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
+    #author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     post_type = models.CharField(max_length=7, choices=POST_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(Category, through='PostCategory')
     title = models.CharField(max_length=200)
     text = models.TextField()
     rating = models.IntegerField(default=0)
+
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.pk)])
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -79,3 +86,16 @@ class Comment(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
+
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subscriptions')
+    subscribed_categories = models.ManyToManyField(Category, related_name='subscriptions')
+
+    def __str__(self):
+        return self.email
+
+
+
+

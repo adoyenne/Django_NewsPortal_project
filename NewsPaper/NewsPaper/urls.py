@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
-
+from news.views import subscriptions
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/posts/')),  # Redirect root URL to /news/
@@ -27,6 +27,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),  # Оставили только allauth
     path('pages/', include('django.contrib.flatpages.urls')),
     path('posts/', include('news.urls')),  # Include news URLs
+    path('subscriptions/', subscriptions, name='subscriptions'),
     # Other URL patterns
 ]
 
