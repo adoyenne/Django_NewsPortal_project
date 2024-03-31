@@ -17,6 +17,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.db import models
 from django.shortcuts import get_object_or_404
 
+from .tasks import send_notification_to_subscribers
+
 class PostsList(ListView):
     # Указываем модель, объекты которой мы будем выводить
     model = Post
@@ -89,7 +91,7 @@ def search_news(request):
     }
     return render(request, 'search_news.html', context)
 
-class CreateNewsView(PermissionRequiredMixin,CreateView):
+class CreateNewsView(PermissionRequiredMixin, CreateView):
     permission_required = ('news.add_post',)
     model = Post
     form_class = NewsForm
@@ -98,12 +100,14 @@ class CreateNewsView(PermissionRequiredMixin,CreateView):
     def form_valid(self, form):
         news = form.save(commit=False)
         news.post_type = 'news'
+        # Вызов задачи Celery для отправки уведомления подписчикам
+        send_notification_to_subscribers.delay(news.id)
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('post_list')
 
-class CreateArticleView(PermissionRequiredMixin,CreateView):
+class CreateArticleView(PermissionRequiredMixin, CreateView):
     permission_required = ('news.add_post',)
     model = Post
     form_class = ArticleForm
@@ -112,6 +116,8 @@ class CreateArticleView(PermissionRequiredMixin,CreateView):
     def form_valid(self, form):
         article = form.save(commit=False)
         article.post_type = 'article'
+        # Вызов задачи Celery для отправки уведомления подписчикам
+        send_notification_to_subscribers.delay(article.id)
         return super().form_valid(form)
 
     def get_success_url(self):
