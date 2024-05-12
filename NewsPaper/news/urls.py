@@ -4,6 +4,8 @@ from .views import (PostsList, PostDetail, search_news,
                     EditPostView,
                     CreateNewsView, CreateArticleView, DeletePostView
                     )
+from django.views.decorators.cache import cache_page # импортируем декоратор для кэширования отдельного представления
+
 
 
 urlpatterns = [
@@ -19,6 +21,13 @@ urlpatterns = [
     # int — указывает на то, что принимаются только целочисленные значения
     path('<int:pk>/', PostDetail.as_view(), name='post_detail'),
     path('search/', search_news, name='search_news'),
+    #path('news/create/', cache_page(60*5)(CreateNewsView.as_view()), name='create_news'),
+    #path('news/<int:pk>/edit/', cache_page(60*5)(EditPostView.as_view()), name='edit_news'),
+    #path('news/<int:pk>/delete/', cache_page(60*5)(DeletePostView.as_view()), name='delete_news'),
+    #path('articles/create/', cache_page(60*5)(CreateArticleView.as_view()), name='create_article'),
+    #path('articles/<int:pk>/edit/', cache_page(60*5)(EditPostView.as_view()), name='edit_article'),
+    #path('articles/<int:pk>/delete/', cache_page(60*5)(DeletePostView.as_view()), name='delete_article'),
+
     path('news/create/', CreateNewsView.as_view(), name='create_news'),
     path('news/<int:pk>/edit/', EditPostView.as_view(), name='edit_news'),
     path('news/<int:pk>/delete/', DeletePostView.as_view(), name='delete_news'),

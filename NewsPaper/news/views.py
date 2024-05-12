@@ -19,6 +19,8 @@ from django.shortcuts import get_object_or_404
 
 from .tasks import send_notification_to_subscribers
 
+from django.core.cache import cache # импортируем наш кэш
+
 class PostsList(ListView):
     # Указываем модель, объекты которой мы будем выводить
     model = Post
@@ -41,6 +43,7 @@ class PostsList(ListView):
         return Post.objects.order_by('-created_at')
 
 
+
 class PostDetail(DetailView):
     # Модель всё та же, но мы хотим получать информацию по отдельному товару
     model = Post
@@ -48,6 +51,18 @@ class PostDetail(DetailView):
     template_name = 'post.html'
     # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'post'
+
+    def get_object(self, *args, **kwargs):
+        # Проверяем, есть ли объект в кэше
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+
+        # Если объекта нет в кэше, получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.get_queryset())
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+
+        return obj
+
 
 
 

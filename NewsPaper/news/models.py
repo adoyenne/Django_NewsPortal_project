@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.urls import reverse
+from django.core.cache import cache
 
 from django.core.mail import send_mail
 
@@ -63,6 +64,10 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     rating = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'post-{self.pk}')  # Удаляем объект из кэша при его сохранении
 
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.pk)])

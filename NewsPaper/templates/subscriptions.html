@@ -5,6 +5,8 @@ Subscriptions
 {% endblock title %}
 
 {% block content %}
+<!--{% load cache %}-->
+<!--{% cache 300 category_list %}-->
     {% for category in categories  %}
         <p>
             {{ category.name }}
@@ -22,4 +24,5 @@ Subscriptions
             </form>
         </p>
     {% endfor %}
+<!--{% endcache %}-->
 {% endblock content %}
